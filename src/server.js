@@ -4,6 +4,8 @@ const { PORT, BOT_TOKEN } = require("./constants/.envirment");
 const ConnectionToDB = require("./configs/db.config");
 const { Telegraf } = require("telegraf");
 const Markup = require("telegraf/markup");
+const setUpSwagger = require("./utils/swagger");
+const { initSuperAdmin } = require("./controllers/admin.controller");
 
 const app = express();
 const bot = new Telegraf(BOT_TOKEN);
@@ -57,8 +59,11 @@ bot.action("return", async (ctx) => {
 
 bot.launch();
 
+setUpSwagger(app);
+
 app.listen(PORT, () => {
   ConnectionToDB();
+  initSuperAdmin();
   console.log("app is running");
 });
 
