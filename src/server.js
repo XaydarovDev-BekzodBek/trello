@@ -61,6 +61,12 @@ bot.launch();
 
 setUpSwagger(app);
 
+const AdminRouter = require("./routes/admin.route");
+app.use("/api", AdminRouter);
+
+const OrderRouter = require("./routes/order.route");
+app.use("/api", OrderRouter);
+
 app.listen(PORT, () => {
   ConnectionToDB();
   initSuperAdmin();
