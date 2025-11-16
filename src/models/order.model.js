@@ -12,12 +12,13 @@ const OrderClientSchema = new Schema(
 const OrderSchema = new Schema(
   {
     direction: { type: String, required: true },
-    date: { type: Date, required: true },
+    date: { type: String, required: true },
     time: { type: String, required: true },
     price: { type: String, required: true },
     clients: [OrderClientSchema],
     limit_of_clients: { type: Number, required: true },
     is_acitve: { type: Boolean, defaultValue: false },
+    type: { type: String, enum: ["go", "return"], required: true },
   },
   { timestamps: true }
 );

@@ -41,6 +41,8 @@ const { OrderCreateValidation } = require("../validations/order.validation");
  *               limit_of_clients:
  *                 type: number
  *                 example: 6
+ *               type:
+ *                 type: string
  *     responses:
  *       '201':
  *          description: Order created
@@ -116,7 +118,6 @@ router.get(
   controller.getOrderById
 );
 
-
 /**
  * @swagger
  * /api/order/{id}:
@@ -153,6 +154,8 @@ router.get(
  *               limit_of_clients:
  *                 type: number
  *                 example: 6
+ *               type:
+ *                 type: string
  *     responses:
  *       '200':
  *          description: Order updated
@@ -168,6 +171,13 @@ router.put(
   middlewares.verifyToken,
   middlewares.verifyAdmin,
   controller.UpdateOrder
+);
+
+router.patch(
+  "/order/:id",
+  middlewares.verifyToken,
+  middlewares.verifyAdmin,
+  controller.changeOfOrder
 );
 
 module.exports = router;

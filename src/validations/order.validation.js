@@ -6,6 +6,7 @@ const OrderCreateValidation = Joi.object({
   time: Joi.string(),
   price: Joi.string().required(),
   limit_of_clients: Joi.number().required(),
+  type: Joi.string().required(),
 });
 
 const OrderUpdateValidation = Joi.object({
@@ -14,6 +15,7 @@ const OrderUpdateValidation = Joi.object({
   time: Joi.string(),
   price: Joi.string().required(),
   limit_of_clients: Joi.number().required(),
+  type: Joi.string().required(),
 });
 
 module.exports = { OrderCreateValidation, OrderUpdateValidation };
