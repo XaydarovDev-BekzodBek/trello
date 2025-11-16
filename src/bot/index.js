@@ -6,7 +6,6 @@ const languages = require("../languages");
 
 const bot = new Telegraf(BOT_TOKEN);
 const deleteChatIds = new Map();
-const userChatIds = new Map();
 
 const findUser = async (ctx) => {
   const user = await BotClientModel.findOne({ chat_id: ctx.chat.id });
@@ -26,6 +25,8 @@ const findUser = async (ctx) => {
 
 bot.start(async (ctx) => {
   const oldUser = await findUser(ctx);
+  oldUser.progress = "choose_lang";
+  await oldUser.save();
   if (oldUser.language == "") {
     const reply = await ctx.reply(
       `Assalomu alaykum!
@@ -49,8 +50,14 @@ O‘zingizga qulay tilni tanlang 🇺🇿
     await ctx.reply(
       languages[oldUser.language || "uzb"]["welcome"],
       Markup.inlineKeyboard([
-        Markup.button.callback(languages["uzb"]["buttons"][0], "borish"),
-        Markup.button.callback(languages["uzb"]["buttons"][1], "qaytish"),
+        Markup.button.callback(
+          languages[oldUser.language || "uzb"]["buttons"][0],
+          "borish"
+        ),
+        Markup.button.callback(
+          languages[oldUser.language || "uzb"]["buttons"][1],
+          "qaytish"
+        ),
       ])
     );
   }
@@ -59,6 +66,7 @@ O‘zingizga qulay tilni tanlang 🇺🇿
 bot.action("language_uzb", async (ctx) => {
   const oldUser = await findUser(ctx);
   oldUser.language = "uzb";
+  oldUser.progress = "choose_direction";
   await oldUser.save();
   await ctx.reply(
     languages["uzb"]["welcome"],
@@ -71,6 +79,21 @@ bot.action("language_uzb", async (ctx) => {
   await ctx.deleteMessage(deleteId);
 });
 
+bot.on("text", async (ctx) => {
+  const oldUser = await findUser(ctx);
+  const date = new Date()
+
+
+  switch (oldUser.progress) {
+    case "choose_region":
+        const orders = await OrderModel.find({direction:ctx.message.text,date})
+        break;
+  
+    default:
+        break;
+  }
+});
+
 bot.action("borish", async (ctx) => {
   const oldUser = await findUser(ctx);
   const regions = languages[oldUser.language || "uzb"]["regions"];
@@ -78,6 +101,9 @@ bot.action("borish", async (ctx) => {
   for (let i = 0; i < regions.length; i += 3) {
     formated.push(regions.slice(i, i + 3));
   }
+
+  oldUser.progress = "choose_region";
+  await oldUser.save();
   await ctx.reply(
     "Borish uchun birinchi o`rinda Shahar tanlang!",
     Markup.keyboard(formated)

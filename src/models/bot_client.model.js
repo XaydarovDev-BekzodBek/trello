@@ -5,8 +5,9 @@ const BotClientSchema = new Schema({
   username: { type: String, required: true },
   full_name: { type: String, required: true },
   language: { type: String, defaultValue: "" },
+  progress: { type: String, defaultValue: "" },
 });
 
-const BotClientModel = model("BotClient",BotClientSchema)
+const BotClientModel = model("BotClient", BotClientSchema);
 
-module.exports = BotClientModel
+module.exports = BotClientModel;
