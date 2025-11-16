@@ -67,11 +67,10 @@ app.use("/api", AdminRouter);
 const OrderRouter = require("./routes/order.route");
 app.use("/api", OrderRouter);
 
-app.listen(PORT, () => {
-  ConnectionToDB();
-  initSuperAdmin();
-  console.log("app is running");
-});
+ConnectionToDB();
+initSuperAdmin();
 
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
+
+module.exports = app;
