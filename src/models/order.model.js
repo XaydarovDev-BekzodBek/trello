@@ -2,9 +2,7 @@ const { Schema, model } = require("mongoose");
 
 const OrderClientSchema = new Schema(
   {
-    userId: { type: String, required: true },
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
+    userId: { type: Schema.ObjectId, required: true, ref: "BotClient" },
   },
   { timestamps: true }
 );

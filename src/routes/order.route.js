@@ -18,8 +18,6 @@ const { OrderCreateValidation } = require("../validations/order.validation");
  *   post:
  *     summary: create order
  *     tags: [Order]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -56,8 +54,8 @@ const { OrderCreateValidation } = require("../validations/order.validation");
 
 router.post(
   "/order/create",
-  middlewares.verifyToken,
-  middlewares.verifyAdmin,
+  // middlewares.verifyToken,
+  // middlewares.verifyAdmin,
   middlewares.verifyValidation(OrderCreateValidation),
   controller.CreateOrder
 );
@@ -68,8 +66,6 @@ router.post(
  *   get:
  *     summary: order lists
  *     tags: [Order]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       '200':
  *          description: Order list
@@ -81,8 +77,8 @@ router.post(
 
 router.get(
   "/order/list",
-  middlewares.verifyToken,
-  middlewares.verifyAdmin,
+  // middlewares.verifyToken,
+  // middlewares.verifyAdmin,
   controller.getOrders
 );
 
@@ -92,8 +88,7 @@ router.get(
  *   get:
  *     summary: get order by id
  *     tags: [Order]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id
@@ -113,8 +108,8 @@ router.get(
  */
 router.get(
   "/order/:id",
-  middlewares.verifyToken,
-  middlewares.verifyAdmin,
+  // middlewares.verifyToken,
+  // middlewares.verifyAdmin,
   controller.getOrderById
 );
 
@@ -124,8 +119,6 @@ router.get(
  *   put:
  *     summary: update order by id
  *     tags: [Order]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -168,15 +161,15 @@ router.get(
  */
 router.put(
   "/order/:id",
-  middlewares.verifyToken,
-  middlewares.verifyAdmin,
+  // middlewares.verifyToken,
+  // middlewares.verifyAdmin,
   controller.UpdateOrder
 );
 
 router.patch(
   "/order/:id",
-  middlewares.verifyToken,
-  middlewares.verifyAdmin,
+  // middlewares.verifyToken,
+  // middlewares.verifyAdmin,
   controller.changeOfOrder
 );
 

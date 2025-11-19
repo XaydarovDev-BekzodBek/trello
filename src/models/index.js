@@ -1,5 +1,6 @@
 const adminModel = require("./admin.model");
 const BotClientModel = require("./bot_client.model");
+const GroupIdModel = require("./groupIds.model");
 const OrderModel = require("./order.model");
 
-module.exports = { adminModel, OrderModel, BotClientModel };
+module.exports = { adminModel, OrderModel, BotClientModel, GroupIdModel };

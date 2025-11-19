@@ -19,6 +19,9 @@ app.use("/api", AdminRouter);
 const OrderRouter = require("./routes/order.route");
 app.use("/api", OrderRouter);
 
+const GroupIdRouter = require("./routes/groupid.route");
+app.use("/api", GroupIdRouter);
+
 bot.launch();
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));

@@ -26,7 +26,7 @@ exports.CreateOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   try {
-    const orders = await OrderModel.find({});
+    const orders = await OrderModel.find({}).populate("clients.userId")
 
     return res.status(200).json({ success: true, orders });
   } catch (error) {
