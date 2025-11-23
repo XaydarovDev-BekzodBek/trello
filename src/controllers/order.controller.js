@@ -2,7 +2,17 @@ const { OrderModel } = require("../models");
 
 exports.CreateOrder = async (req, res) => {
   try {
-    const { direction, date, time, price, limit_of_clients, type } = req.body;
+    const {
+      direction,
+      date,
+      time,
+      price,
+      limit_of_clients,
+      type,
+      company,
+      bilet_id,
+      arrive_time,
+    } = req.body;
 
     const order = await OrderModel.create({
       direction,
@@ -13,6 +23,9 @@ exports.CreateOrder = async (req, res) => {
       clients: [],
       is_acitve: false,
       type,
+      company,
+      bilet_id,
+      arrive_time,
     });
 
     return res
@@ -26,7 +39,7 @@ exports.CreateOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   try {
-    const orders = await OrderModel.find({}).populate("clients.userId")
+    const orders = await OrderModel.find({}).populate("clients.userId");
 
     return res.status(200).json({ success: true, orders });
   } catch (error) {
@@ -86,15 +99,19 @@ exports.UpdateOrder = async (req, res) => {
 
 exports.changeOfOrder = async (req, res) => {
   try {
-    const orderId = req.params.id
-    const order = await OrderModel.findById(orderId)
-    if(!order){
-      return res.status(404).json({success:false,message:"order not found"})
+    const orderId = req.params.id;
+    const order = await OrderModel.findById(orderId);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
     }
-  
-    order.is_acitve = !order.is_acitve
-    await order.save()
-    return res.status(200).json({success:true,message:"order is active changed"})
+
+    order.is_acitve = !order.is_acitve;
+    await order.save();
+    return res
+      .status(200)
+      .json({ success: true, message: "order is active changed" });
   } catch (error) {
     console.error(error);
     return res.status(500).send(error);

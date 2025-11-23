@@ -56,8 +56,13 @@ bot.start(async (ctx) => {
                 { text: "Бориш ✈️" },
                 { text: "Қайтиш 🏡" },
                 { text: "Билетларим 🎟" },
+                { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
               ]
-            : [{ text: "Бориш ✈️" }, { text: "Қайтиш 🏡" }],
+            : [
+                { text: "Бориш ✈️" },
+                { text: "Қайтиш 🏡" },
+                { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
+              ],
         ],
         resize_keyboard: true,
       },
@@ -65,112 +70,135 @@ bot.start(async (ctx) => {
   );
 });
 
+bot.command("group", async (ctx) => {
+  if (ctx.chat.type === "group") {
+    const chatId = ctx.chat.id;
+    const oldGroup = await GroupIdModel.findOne({ groupId: chatId });
+    if (oldGroup) {
+      await ctx.reply("bot bu gurupada bor");
+    } else {
+      await GroupIdModel.create({ groupId: chatId });
+      await ctx.reply("Bot bu gurupada ishga tushdi");
+    }
+  }
+});
+
 bot.on("text", async (ctx) => {
   const oldUser = await findUser(ctx);
   const progress = oldUser.progress.split("__")[0];
   const progressValue = oldUser.progress.split("__")[1];
-  switch (progress) {
-    case "choose_direction":
-      if (!oldUser.username || !oldUser.phone) {
-        oldUser.progress = "take_full_name";
-        await ctx.reply(
-          "Илтимос Исm ва фамилиянгизни ёзинг",
-          Markup.removeKeyboard()
-        );
-        await oldUser.save();
-      } else {
-        const formatedRegions = [];
-        for (let i = 0; i < regions.length; i += 3) {
-          formatedRegions.push(regions.slice(i, i + 3));
-        }
-
-        oldUser.progress = `choose_region__${
-          ctx.message.text == "Бориш ✈️" ? "go" : "return"
-        }`;
-        await oldUser.save();
-        await ctx.reply(
-          "Бориш учун биринчи ўринда Шаҳар танланг!",
-          Markup.keyboard(formatedRegions)
-        );
-      }
-      break;
-    case "choose_region":
-      const orders = await OrderModel.find({
-        direction: ctx.message.text,
-        is_acitve: false,
-        type: progressValue,
-      });
-      let replyText = `\АРЗОН  ${
-        progressValue === "go" ? "БОРИШ" : "ҚАЙТИШ"
-      } БИЛЕТЛАРИ \n`;
-      const buttons = [];
-      const formated = [];
-
-      if (orders.length === 0) {
-        replyText += "";
-      } else {
-        for (let i = 0; i < orders.length; i++) {
-          const order = orders[i];
-          replyText += `\n${i + 1}. 🗓 Сана: ${order.date}`;
-          buttons.push(
-            Markup.button.callback(i + 1, `choose_ticket_${order._id}`)
-          );
-        }
-      }
-
-      for (let i = 0; i < buttons.length; i += 4) {
-        formated.push(buttons.slice(i, i + 4));
-      }
-
-      await ctx.reply(replyText, Markup.inlineKeyboard(formated));
-      break;
-    case "take_full_name":
-      const full_name = ctx.message.text.split(" ");
-
-      if (!full_name[0] || !full_name[1] || full_name.length == 0) {
-        await ctx.reply("Сиз нотўғри ҳолатда ёздингиз исм фамилия ёзиш керак");
-      } else {
-        oldUser.progress = "take_number";
-        oldUser.full_name = full_name.join(" ");
-        await oldUser.save();
-        await ctx.reply("Илтимос телефон рақамингизни киритинг", {
-          reply_markup: {
-            keyboard: [
-              [{ text: "📲 Телефон рақамини улашиш", request_contact: true }],
-            ],
-            one_time_keyboard: true,
-            resize_keyboard: true,
-          },
-        });
-      }
-      break;
-    default:
-      break;
-  }
   if (ctx.message.text == "Билетларим 🎟") {
     let text = "";
     const orders = await OrderModel.find({ "clients.userId": oldUser._id });
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
-      text += `\n🗓 Сана: ${order.date} 
+      text += `\n\n🗓 Сана: ${order.date} 
 ⏱ Кетиш вақти: ${order.time} 
-💰 Тўлов: ${order.price} 
-🎟 Умумий билетлар сони: ${order.limit_of_clients} 
-✅ Сотиб олинган билетлар: ${order.clients.length}`;
+💰 Тўлов: ${order.price}\n`;
     }
     await ctx.reply(
-      `Sizning biletlaringiz
+      `Сизнинг харидларингиз
        \n--------------------------------------------------------------` +
         text +
         ` \n--------------------------------------------------------------`
     );
   }
+  else if(ctx.message.text === "Aдмин билан боғланиш 🙎🏻‍♂️"){
+    await ctx.reply(`Aдмин билан боғланиш усуллари: \n\nAдмин username: @Admin \nTелефон рақам: +998 99 000 11 22`)
+  }
+  else {
+    switch (progress) {
+      case "choose_direction":
+        if (!oldUser.username || !oldUser.phone) {
+          oldUser.progress = "take_full_name";
+          await ctx.reply(
+            "Илтимос Исm ва фамилиянгизни ёзинг",
+            Markup.removeKeyboard()
+          );
+          await oldUser.save();
+        } else {
+          const formatedRegions = [];
+          for (let i = 0; i < regions.length; i += 3) {
+            formatedRegions.push(regions.slice(i, i + 3));
+          }
+
+          oldUser.progress = `choose_region__${
+            ctx.message.text == "Бориш ✈️" ? "go" : "return"
+          }`;
+          await oldUser.save();
+          await ctx.reply(
+            "Бориш учун биринчи ўринда Шаҳар танланг!",
+            Markup.keyboard(formatedRegions)
+          );
+        }
+        break;
+      case "choose_region":
+        const orders = await OrderModel.find({
+          direction: ctx.message.text,
+          is_acitve: false,
+          type: progressValue,
+        });
+        let replyText = `\АРЗОН  ${
+          progressValue === "go" ? "БОРИШ" : "ҚАЙТИШ"
+        } БИЛЕТЛАРИ \n`;
+        const buttons = [];
+        const formated = [];
+
+        if (orders.length === 0) {
+          replyText += "";
+        } else {
+          for (let i = 0; i < orders.length; i++) {
+            const order = orders[i];
+            replyText += `\n${i + 1}. 🗓 Сана: ${order.date}`;
+            buttons.push(
+              Markup.button.callback(i + 1, `choose_ticket_${order._id}`)
+            );
+          }
+        }
+
+        for (let i = 0; i < buttons.length; i += 4) {
+          formated.push(buttons.slice(i, i + 4));
+        }
+
+        await ctx.reply(replyText, Markup.inlineKeyboard(formated));
+        break;
+      case "take_full_name":
+        const full_name = ctx.message.text.split(" ");
+
+        if (!full_name[0] || !full_name[1] || full_name.length == 0) {
+          await ctx.reply(
+            "Сиз нотўғри ҳолатда ёздингиз исм фамилия ёзиш керак"
+          );
+        } else {
+          oldUser.progress = "take_number";
+          oldUser.full_name = full_name.join(" ");
+          await oldUser.save();
+          await ctx.reply("Илтимос телефон рақамингизни киритинг", {
+            reply_markup: {
+              keyboard: [
+                [{ text: "📲 Телефон рақамини улашиш", request_contact: true }],
+              ],
+              one_time_keyboard: true,
+              resize_keyboard: true,
+            },
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
 });
 
 bot.on("contact", async (ctx) => {
   const oldUser = await findUser(ctx);
-  const phoneNumber = ctx.message.contact.phone_number;
+  const phoneNumber =
+    ctx.message.contact.phone_number[0] === "+"
+      ? ctx.message.contact.phone_number
+      : "+" + ctx.message.contact.phone_number;
   const regux = /^\+998(33|55|77|88|90|91|93|94|95|97|98|99)\d{7}$/;
+  console.log(phoneNumber);
+  console.log(regux.test(phoneNumber));
   if (!regux.test(phoneNumber)) {
     await ctx.reply("Илтимос телефон рақам хато киритилди");
   } else {
@@ -203,11 +231,16 @@ bot.action(/choose_ticket_([a-fA-F0-9]+)/, async (ctx) => {
     await ctx.reply("Bunday bilet topilmadi !");
   } else {
     await ctx.reply(
-      `🗓 Сана: ${order.date} 
-⏱ Кетиш вақти: ${order.time} 
-💰 Тўлов: ${order.price} 
-🎟 Умумий билетлар сони: ${order.limit_of_clients} 
-✅ Сотиб олинган билетлар: ${order.clients.length}`,
+      `
+\n💰 Тўлов: ${order.price}
+📆Сана: ${order.price}
+🛬Кетиш вақти: ${order.time}
+🛬Қуниш вақти: ${order.arrive_time || ""}
+🛩 Кампания : ${order.company || ""}
+🛩 Рейс : ${order.bilet_id || ""}
+🍱 Иссиқ Таом 
+💧 Замзам
+`,
       Markup.inlineKeyboard([
         [Markup.button.callback("Сотиб олиш", "buy_ticket_" + order._id)],
       ])
@@ -230,17 +263,25 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
   const ticketId = ctx.match[0].split("_")[2];
   const order = await OrderModel.findById(ticketId);
   order.clients.push({ userId: oldUser._id });
-  oldUser.progress = "";
+  oldUser.progress = "choose_direction";
   await oldUser.save();
   await order.save();
-  await ctx.reply("Сиз битта билет олдингиз", {
-    reply_markup: {
-      keyboard: [
-        [{ text: "Бориш ✈️" }, { text: "Қайтиш 🏡" }, { text: "Билетларим 🎟" }],
-      ],
-      resize_keyboard: true,
-    },
-  });
+  await ctx.reply(
+    "Сиз битта билет олдингиз \n\nАДМИН билан боғланинг, у сизга ҳамма нарсани тушунтиради АДМИН: @trello_one_bot",
+    {
+      reply_markup: {
+        keyboard: [
+          [
+            { text: "Бориш ✈️" },
+            { text: "Қайтиш 🏡" },
+            { text: "Билетларим 🎟" },
+            { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
+          ],
+        ],
+        resize_keyboard: true,
+      },
+    }
+  );
 });
 
 // bot.action("borish", async (ctx) => {

@@ -33,6 +33,13 @@ const { OrderCreateValidation } = require("../validations/order.validation");
  *               time:
  *                 type: string
  *                 example: 20:00
+ *               arrive_time:
+ *                 type: string
+ *                 example: 20:00
+ *               company:
+ *                 type: string
+ *               bilet_id:
+ *                 type: string
  *               price:
  *                 type: string
  *                 example: 200$
@@ -148,6 +155,13 @@ router.get(
  *                 type: number
  *                 example: 6
  *               type:
+ *                 type: string
+ *               arrive_time:
+ *                 type: string
+ *                 example: 20:00
+ *               company:
+ *                 type: string
+ *               bilet_id:
  *                 type: string
  *     responses:
  *       '200':
