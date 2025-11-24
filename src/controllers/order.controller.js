@@ -39,7 +39,10 @@ exports.CreateOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   try {
-    const orders = await OrderModel.find({}).populate("clients.userId");
+    const startDate = req.query.start.split("T")[0];
+    const orders = await OrderModel.find({
+      date: { $gte: startDate },
+    }).populate("clients.userId");
 
     return res.status(200).json({ success: true, orders });
   } catch (error) {
@@ -112,6 +115,23 @@ exports.changeOfOrder = async (req, res) => {
     return res
       .status(200)
       .json({ success: true, message: "order is active changed" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
+};
+
+exports.deleteOrder = async (req, res) => {
+  try {
+    const order = await OrderModel.findByIdAndDelete(req.params.id);
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
+
+    return res.status(200).json({ message: "order deleted" });
   } catch (error) {
     console.error(error);
     return res.status(500).send(error);

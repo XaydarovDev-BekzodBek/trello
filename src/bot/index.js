@@ -87,6 +87,13 @@ bot.on("text", async (ctx) => {
   const oldUser = await findUser(ctx);
   const progress = oldUser.progress.split("__")[0];
   const progressValue = oldUser.progress.split("__")[1];
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+
   if (ctx.message.text == "Билетларим 🎟") {
     let text = "";
     const orders = await OrderModel.find({ "clients.userId": oldUser._id });
@@ -102,11 +109,11 @@ bot.on("text", async (ctx) => {
         text +
         ` \n--------------------------------------------------------------`
     );
-  }
-  else if(ctx.message.text === "Aдмин билан боғланиш 🙎🏻‍♂️"){
-    await ctx.reply(`Aдмин билан боғланиш усуллари: \n\nAдмин username: @Admin \nTелефон рақам: +998 99 000 11 22`)
-  }
-  else {
+  } else if (ctx.message.text === "Aдмин билан боғланиш 🙎🏻‍♂️") {
+    await ctx.reply(
+      `Aдмин билан боғланиш усуллари: \n\nAдмин username: @Admin \nTелефон рақам: +998 99 000 11 22`
+    );
+  } else {
     switch (progress) {
       case "choose_direction":
         if (!oldUser.username || !oldUser.phone) {
@@ -137,6 +144,7 @@ bot.on("text", async (ctx) => {
           direction: ctx.message.text,
           is_acitve: false,
           type: progressValue,
+          date: { $gte: todayStr },
         });
         let replyText = `\АРЗОН  ${
           progressValue === "go" ? "БОРИШ" : "ҚАЙТИШ"
@@ -149,6 +157,7 @@ bot.on("text", async (ctx) => {
         } else {
           for (let i = 0; i < orders.length; i++) {
             const order = orders[i];
+
             replyText += `\n${i + 1}. 🗓 Сана: ${order.date}`;
             buttons.push(
               Markup.button.callback(i + 1, `choose_ticket_${order._id}`)

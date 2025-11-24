@@ -187,4 +187,6 @@ router.patch(
   controller.changeOfOrder
 );
 
+router.delete("/order/:id", controller.deleteOrder);
+
 module.exports = router;
