@@ -1,0 +1,6 @@
+[
+  {
+    "name": "sendDailyReports",
+    "schedule": "0 0 * * *"
+  }
+]

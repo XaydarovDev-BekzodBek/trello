@@ -4,8 +4,8 @@ const { BOT_TOKEN } = require("../constants/.envirment");
 const { BotClientModel, OrderModel, GroupIdModel } = require("../models");
 
 const regions = [
+  "Тошкент вилояти",
   "Андижон",
-  "Бухоро",
   "Фарғона",
   "Жиззах",
   "Хоразм",
@@ -15,7 +15,7 @@ const regions = [
   "Самарқанд",
   "Сирдарё",
   "Сурхондарё",
-  "Тошкент вилояти",
+  "Бухоро",
 ];
 
 const bot = new Telegraf(BOT_TOKEN);
@@ -96,7 +96,10 @@ bot.on("text", async (ctx) => {
 
   if (ctx.message.text == "Билетларим 🎟") {
     let text = "";
-    const orders = await OrderModel.find({ "clients.userId": oldUser._id });
+    const orders = await OrderModel.find({
+      "clients.userId": oldUser._id,
+      is_acitve: false,
+    });
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
       text += `\n\n🗓 Сана: ${order.date} 
@@ -242,7 +245,7 @@ bot.action(/choose_ticket_([a-fA-F0-9]+)/, async (ctx) => {
     await ctx.reply(
       `
 \n💰 Тўлов: ${order.price}
-📆Сана: ${order.price}
+📆Сана: ${order.date}
 🛬Кетиш вақти: ${order.time}
 🛬Қуниш вақти: ${order.arrive_time || ""}
 🛩 Кампания : ${order.company || ""}

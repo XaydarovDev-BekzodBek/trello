@@ -7,9 +7,9 @@ exports.CreateOrder = async (req, res) => {
       date,
       time,
       price,
-      limit_of_clients,
       type,
       company,
+      buyed_ticket,
       bilet_id,
       arrive_time,
     } = req.body;
@@ -19,11 +19,11 @@ exports.CreateOrder = async (req, res) => {
       date,
       time,
       price,
-      limit_of_clients,
       clients: [],
       is_acitve: false,
       type,
       company,
+      buyed_ticket,
       bilet_id,
       arrive_time,
     });
@@ -39,10 +39,12 @@ exports.CreateOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   try {
-    const startDate = req.query.start.split("T")[0];
-    const orders = await OrderModel.find({
-      date: { $gte: startDate },
-    }).populate("clients.userId");
+    const startDate = req.query?.start?.split("T")[0];
+    const orders = startDate
+      ? await OrderModel.find({
+          date: { $gte: startDate },
+        }).populate("clients.userId")
+      : await OrderModel.find({}).populate("clients.userId");
 
     return res.status(200).json({ success: true, orders });
   } catch (error) {
@@ -72,7 +74,7 @@ exports.getOrderById = async (req, res) => {
 exports.UpdateOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const { direction, date, time, price, limit_of_clients, type } = req.body;
+    const { direction, date, time, price, buyed_ticket, type } = req.body;
 
     const order = await OrderModel.findByIdAndUpdate(
       orderId,
@@ -81,7 +83,7 @@ exports.UpdateOrder = async (req, res) => {
         date,
         time,
         price,
-        limit_of_clients,
+        buyed_ticket,
         type,
       },
       { new: true }
@@ -132,6 +134,30 @@ exports.deleteOrder = async (req, res) => {
     }
 
     return res.status(200).json({ message: "order deleted" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
+};
+
+exports.addPeopel = async (req, res) => {
+  try {
+    const { id, userId } = req.params;
+    const { people } = req.body;
+
+    const order = await OrderModel.findById(id);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
+    const user = order.clients.find((i) => i.userId == userId);
+
+    user.people = people;
+
+    await order.save();
+
+    return res.status(200).json({ message: "people added" });
   } catch (error) {
     console.error(error);
     return res.status(500).send(error);

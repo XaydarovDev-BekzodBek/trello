@@ -3,6 +3,7 @@ const { Schema, model } = require("mongoose");
 const OrderClientSchema = new Schema(
   {
     userId: { type: Schema.ObjectId, required: true, ref: "BotClient" },
+    people: { type: Number },
   },
   { timestamps: true }
 );
@@ -15,7 +16,7 @@ const OrderSchema = new Schema(
     arrive_time: { type: String, defaultValue: "" },
     price: { type: String, required: true },
     clients: [OrderClientSchema],
-    limit_of_clients: { type: Number, required: true },
+    buyed_ticket: { type: Number },
     is_acitve: { type: Boolean, defaultValue: false },
     company: { type: String, defaultValue: "" },
     bilet_id: { type: String, defaultValue: "" },

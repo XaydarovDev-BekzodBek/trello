@@ -3,7 +3,10 @@ const router = Router();
 
 const controller = require("../controllers/order.controller");
 const middlewares = require("../middlewares");
-const { OrderCreateValidation } = require("../validations/order.validation");
+const {
+  OrderCreateValidation,
+  AddPeopleOrderValidation,
+} = require("../validations/order.validation");
 
 /**
  * @swagger
@@ -43,7 +46,7 @@ const { OrderCreateValidation } = require("../validations/order.validation");
  *               price:
  *                 type: string
  *                 example: 200$
- *               limit_of_clients:
+ *               buyed_ticket:
  *                 type: number
  *                 example: 6
  *               type:
@@ -151,7 +154,7 @@ router.get(
  *               price:
  *                 type: string
  *                 example: 200$
- *               limit_of_clients:
+ *               buyed_ticket:
  *                 type: number
  *                 example: 6
  *               type:
@@ -188,5 +191,11 @@ router.patch(
 );
 
 router.delete("/order/:id", controller.deleteOrder);
+
+router.patch(
+  "/order/:id/:userId",
+  middlewares.verifyValidation(AddPeopleOrderValidation),
+  controller.addPeopel
+);
 
 module.exports = router;

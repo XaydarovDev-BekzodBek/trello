@@ -5,6 +5,9 @@ const ConnectionToDB = require("./configs/db.config");
 const setUpSwagger = require("./utils/swagger");
 const { initSuperAdmin } = require("./controllers/admin.controller");
 const bot = require("./bot");
+const cron = require("node-cron");
+const jobsConfig = require("./json/node-cron.json");
+const { OrderModel } = require("./models");
 
 const app = express();
 
@@ -22,9 +25,36 @@ app.use("/api", OrderRouter);
 const GroupIdRouter = require("./routes/groupid.route");
 app.use("/api", GroupIdRouter);
 
+const StatsRouter = require("./routes/stats.route")
+app.use("/api",StatsRouter)
+
 bot.launch();
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
+
+const tasks = {
+  sendDailyReports: async () => {
+    const date = new Date().toISOString().split("T")[0];
+    await OrderModel.updateMany(
+      { date: { $lt: date } },
+      { is_acitve: true },
+      { new: true }
+    );
+    console.log("Daily reports sent! (" + new Date().toLocaleString() + ")");
+  },
+};
+
+jobsConfig.forEach((job) => {
+  if (tasks[job.name]) {
+    cron.schedule(job.schedule, tasks[job.name], {
+      scheduled: true,
+      timezone: "Asia/Tashkent",
+    });
+    console.log(`Job rejalashtirildi: ${job.name} - Jadval: ${job.schedule}`);
+  } else {
+    console.error(`Xato: ${job.name} funksiyasi topilmadi.`);
+  }
+});
 
 app.listen(PORT, () => {
   ConnectionToDB();
