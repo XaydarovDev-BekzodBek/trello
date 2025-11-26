@@ -28,7 +28,7 @@ exports.getStats = async (req, res) => {
     };
 
     const buildStats = async (filter) => {
-      const orders = await Order.find(filter);
+      const orders = await Order.find(filter).populate("clients.userId")
 
       let totalPrice = 0;
       let totalBuyed = 0;
@@ -51,7 +51,15 @@ exports.getStats = async (req, res) => {
         else loss += Math.abs(diff);
       });
 
-      return { totalPrice, totalBuyed, totalSold, profit, loss, totalTicket };
+      return {
+        totalPrice,
+        totalBuyed,
+        totalSold,
+        profit,
+        loss,
+        totalTicket,
+        tickets: orders,
+      };
     };
 
     const today = await buildStats(filters.today);

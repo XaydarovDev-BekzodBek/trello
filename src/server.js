@@ -25,10 +25,16 @@ app.use("/api", OrderRouter);
 const GroupIdRouter = require("./routes/groupid.route");
 app.use("/api", GroupIdRouter);
 
-const StatsRouter = require("./routes/stats.route")
-app.use("/api",StatsRouter)
+const StatsRouter = require("./routes/stats.route");
+app.use("/api", StatsRouter);
 
-bot.launch();
+bot.launch({
+  webhook: {
+    domain: "https://trello.techinfo.uz",
+    port: 8999,
+    path: "/tg_webhook_1a2b3c4d5e6f7g8h9i0j",
+  },
+});
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
