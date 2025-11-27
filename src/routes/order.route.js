@@ -191,6 +191,7 @@ router.patch(
 );
 
 router.delete("/order/:id", controller.deleteOrder);
+router.delete("/order/:id/:userId", controller.deleteClient);
 
 router.patch(
   "/order/:id/:userId",

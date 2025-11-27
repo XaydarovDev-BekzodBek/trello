@@ -4,6 +4,8 @@ exports.CreateOrder = async (req, res) => {
   try {
     const {
       direction,
+      direction_to,
+      bagaj,
       date,
       time,
       price,
@@ -16,6 +18,8 @@ exports.CreateOrder = async (req, res) => {
 
     const order = await OrderModel.create({
       direction,
+      direction_to,
+      bagaj,
       date,
       time,
       price,
@@ -74,7 +78,16 @@ exports.getOrderById = async (req, res) => {
 exports.UpdateOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const { direction, date, time, price, buyed_ticket, type } = req.body;
+    const {
+      direction,
+      date,
+      time,
+      price,
+      buyed_ticket,
+      type,
+      direction_to,
+      bagaj,
+    } = req.body;
 
     const order = await OrderModel.findByIdAndUpdate(
       orderId,
@@ -85,6 +98,8 @@ exports.UpdateOrder = async (req, res) => {
         price,
         buyed_ticket,
         type,
+        direction_to,
+        bagaj,
       },
       { new: true }
     );
@@ -158,6 +173,27 @@ exports.addPeopel = async (req, res) => {
     await order.save();
 
     return res.status(200).json({ message: "people added" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
+};
+
+exports.deleteClient = async (req, res) => {
+  try {
+    const { id, userId } = req.params;
+
+    const order = await OrderModel.findById(id);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
+
+    order.clients = order.clients.filter((i) => i._id.toString() !== userId);
+    await order.save();
+
+    return res.status(200).json({ message: "client deleted" });
   } catch (error) {
     console.error(error);
     return res.status(500).send(error);

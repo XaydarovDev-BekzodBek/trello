@@ -2,6 +2,8 @@ const Joi = require("joi");
 
 const OrderCreateValidation = Joi.object({
   direction: Joi.string().required(),
+  direction_to: Joi.string().required(),
+  bagaj: Joi.string().required(),
   date: Joi.date().required(),
   time: Joi.string(),
   price: Joi.string().required(),
@@ -14,6 +16,8 @@ const OrderCreateValidation = Joi.object({
 
 const OrderUpdateValidation = Joi.object({
   direction: Joi.string().required(),
+  direction_to: Joi.string().required(),
+  bagaj: Joi.string().required(),
   date: Joi.date().required(),
   time: Joi.string(),
   price: Joi.string().required(),

@@ -11,6 +11,8 @@ const OrderClientSchema = new Schema(
 const OrderSchema = new Schema(
   {
     direction: { type: String, required: true },
+    direction_to: { type: String, required: true },
+    bagaj: { type: String, required: true },
     date: { type: String, required: true },
     time: { type: String, required: true },
     arrive_time: { type: String, defaultValue: "" },
