@@ -18,6 +18,8 @@ const regions = [
   "Бухоро",
 ];
 
+const adminIds = ["-5007246078"];
+
 const bot = new Telegraf(BOT_TOKEN);
 const deleteChatIds = new Map();
 const users = new Map();
@@ -294,6 +296,19 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
   oldUser.progress = "choose_direction";
   await oldUser.save();
   await order.save();
+  for (let i = 0; i < adminIds.length; i++) {
+    const groupId = adminIds[i];
+
+    await ctx.telegram.sendMessage(
+      groupId.groupId,
+      `Yangi odam bilet sotib oldi:
+       \nusername:${oldUser.username}
+       \nphone: ${oldUser.phone}
+       \nbilet nomi:${order.direction} to ${order.direction_to}
+       \nkampaniya: ${order.company}
+      `
+    );
+  }
   await ctx.reply(
     "Сиз битта билет олдингиз \n\nАДМИН билан боғланинг, у сизга ҳамма нарсани тушунтиради АДМИН: @trello_one_bot",
     {
