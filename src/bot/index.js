@@ -48,7 +48,6 @@ bot.start(async (ctx) => {
   //     await ctx.reply("Bot bu gurupada ishga tushdi");
   //   }
   // }
-  console.log('start')
   const chatId = ctx.chat.id;
   const oldGroup = await GroupIdModel.findOne({ groupId: chatId });
   if (oldGroup || ctx.chat.type == "group") {
