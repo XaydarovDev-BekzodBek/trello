@@ -356,45 +356,62 @@ bot.action("group", async (ctx) => {
     await ctx.telegram.sendMessage(groupId.groupId, "Yangi odam qo`shildi");
   }
 });
-
 bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
-  const oldUser = await findUser(ctx);
-  const ticketId = ctx.match[0].split("_")[2];
-  const order = await OrderModel.findById(ticketId);
-  order.clients.push({ userId: oldUser._id });
-  oldUser.progress = "choose_direction";
-  await oldUser.save();
-  await order.save();
-  for (let i = 0; i < adminIds.length; i++) {
-    const groupId = adminIds[i];
+  try {
+    const oldUser = await findUser(ctx);
+    const ticketId = ctx.match[0].split("_")[2];
+    const order = await OrderModel.findById(ticketId);
 
-    await ctx.telegram.sendMessage(
-      groupId,
-      `Yangi odam bilet sotib oldi:
-       \nusername:@${oldUser.username}
-       \nphone: ${oldUser.phone}
-       \nbilet nomi:${order.direction} to ${order.direction_to}
-       \nkampaniya: ${order.company}
-       \bilet id: ${order.bilet_id}
-      `
-    );
-  }
-  await ctx.reply(
-    "Сиз битта билет олдингиз \n\nАДМИН билан боғланинг, у сизга ҳамма нарсани тушунтиради АДМИН: @Arzonbiletch1",
-    {
-      reply_markup: {
-        keyboard: [
-          [
-            { text: "Бориш ✈️" },
-            { text: "Қайтиш 🏡" },
-            { text: "Билетларим 🎟" },
-            { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
-          ],
-        ],
-        resize_keyboard: true,
-      },
+    order.clients.push({ userId: oldUser._id });
+    oldUser.progress = "choose_direction";
+    await oldUser.save();
+    await order.save();
+
+    for (let i = 0; i < adminIds.length; i++) {
+      const groupId = adminIds[i];
+      
+      try {
+          await ctx.telegram.sendMessage(
+              groupId,
+              `Yangi odam bilet sotib oldi:
+               \nusername:@${oldUser.username}
+               \nphone: ${oldUser.phone}
+               \nbilet nomi:${order.direction} to ${order.direction_to}
+               \nkampaniya: ${order.company}
+               \bilet id: ${order.bilet_id}
+              `
+          );
+      } catch (adminError) {
+          console.error(`Failed to notify admin ${groupId}:`, adminError.message);
+      }
     }
-  );
+
+    await ctx.reply(
+      "Сиз битта билет олдингиз \n\nАДМИН билан боғланинг, у сизга ҳамма нарсани тушунтиради АДМИН: @Arzonbiletch1",
+      {
+        reply_markup: {
+          keyboard: [
+            [
+              { text: "Бориш ✈️" },
+              { text: "Қайтиш 🏡" },
+              { text: "Билетларим 🎟" },
+              { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
+            ],
+          ],
+          resize_keyboard: true,
+        },
+      }
+    );
+
+    await ctx.answerCbQuery(); 
+
+  } catch (error) {
+    if (error.code === 400 && error.message.includes('chat not found')) {
+      console.warn(`[Buy Ticket] User ${ctx.from.id} blocked the bot after clicking. Database update successful, skipping reply.`);
+    } else {
+      console.error("[Buy Ticket] An unexpected error occurred:", error);
+    }
+  }
 });
 
 module.exports = { bot, sendTodayTicketsNotification };
