@@ -37,21 +37,28 @@ const findUser = async (ctx) => {
     console.log("user created");
     return newUser;
   } else {
+    if (user.username != ctx.chat.username) {
+      user.username = ctx.chat.username;
+    } else if (user.phone != ctx.chat.phone) {
+      user.phone = ctx.chat.phone;
+    }
+
+    await user.save() 
     return user;
   }
 };
 
 const formatSingleOrder = (order, index) => {
-  const totalPeople = order.clients
-    ? order.clients.reduce((sum, c) => sum + (c.people || 0), 0)
-    : 0;
-
   return `
-*${index + 1}. Bilet ID:* ${order.bilet_id || "Yoʻq"}
-*Yo'nalish:* ${order.direction} ➡️ ${order.direction_to}
-*Vaqt:* ${order.time}${order.arrive_time ? ` - ${order.arrive_time}` : ""}
-*Narxi:* $${order.price} | *Kompaniya:* ${order.company || "Nomaʼlum"}
-*Jami kishi:* ${totalPeople}
+*${index + 1}.📆Сана: ${order.date}
+🛫Кетиш вақти: ${order.time}
+🛬Қуниш вақти: ${order.arrive_time}
+✈️ Билет ID: ${order.bilet_id}
+🛩️ Кампания: ${order.company} 
+🧳Багаж: ${order.bagaj} 
+🍱 Иссиқ Таом 
+💧 Замзам
+💰 Нархи : ${order.price}$
 ---`;
 };
 
@@ -184,14 +191,17 @@ bot.on("text", async (ctx) => {
     });
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
-      text += `\n✈️ Йўналиш: ${order.direction}`;
-      text += `\n✈️ Қаерга бориш: ${order.direction_to}`;
-      text += `\n🗓 Сана: **${order.date}**`;
-      text += `\n⏱ Кетиш вақти: **${order.time}**`;
-      text += `\n✈️ Компания: ${order.company}`;
-      text += `\n✈️ Билет ID: ${order.bilet_id}`;
-      text += `\n✈️ Багаж: ${order.bagaj}`;
-      text += `\n💰 Тўлов: **${order.price}**\n`;
+      text += `
+📆Сана: ${order.date}
+🛫Кетиш вақти: ${order.time}
+🛬Қуниш вақти: ${order.arrive_time}
+✈️ Билет ID: ${order.bilet_id}
+🛩️ Кампания: ${order.company} 
+🧳Багаж: ${order.bagaj} 
+🍱 Иссиқ Таом 
+💧 Замзам
+💰 Нархи : ${order.price}$
+      `;
     }
     await ctx.reply(
       `Сизнинг харидларингиз
@@ -250,7 +260,9 @@ bot.on("text", async (ctx) => {
         const formated = [];
 
         if (orders.length === 0) {
-          await ctx.reply("Ҳозирча бу шаҳарга жойлар қолмаган, ўзингизга яқинроқ шаҳарни танланг")
+          await ctx.reply(
+            "Ҳозирча бу шаҳарга жойлар қолмаган, ўзингизга яқинроқ шаҳарни танланг"
+          );
         } else {
           for (let i = 0; i < orders.length; i++) {
             const order = orders[i];
@@ -330,15 +342,15 @@ bot.action(/choose_ticket_([a-fA-F0-9]+)/, async (ctx) => {
     await ctx.reply(
       `
 📆Сана: ${order.date}
-🛬Кетиш вақти: ${order.time}
-🛬Қуниш вақти: ${order.arrive_time || ""}
+🛫Кетиш вақти: ${order.time}
+🛬Қуниш вақти: ${order.arrive_time}
 ✈️ Билет ID: ${order.bilet_id}
-✈️ Багаж: ${order.bagaj}
-🛩 Кампания : ${order.company || ""}
-🛩 Рейс : ${order.bilet_id || ""}
-💰 Тўлов: ${order.price}
+🛩️ Кампания: ${order.company} 
+🧳Багаж: ${order.bagaj} 
 🍱 Иссиқ Таом 
 💧 Замзам
+
+💰 Нархи : ${order.price}$
 `,
       Markup.inlineKeyboard([
         [Markup.button.callback("Сотиб олиш", "buy_ticket_" + order._id)],
@@ -356,6 +368,7 @@ bot.action("group", async (ctx) => {
     await ctx.telegram.sendMessage(groupId.groupId, "Yangi odam qo`shildi");
   }
 });
+
 bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
   try {
     const oldUser = await findUser(ctx);
@@ -369,20 +382,20 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
 
     for (let i = 0; i < adminIds.length; i++) {
       const groupId = adminIds[i];
-      
+
       try {
-          await ctx.telegram.sendMessage(
-              groupId,
-              `Yangi odam bilet sotib oldi:
+        await ctx.telegram.sendMessage(
+          groupId,
+          `Yangi odam bilet sotib oldi:
                \nusername:@${oldUser.username}
                \nphone: ${oldUser.phone}
                \nbilet nomi:${order.direction} to ${order.direction_to}
                \nkampaniya: ${order.company}
                \bilet id: ${order.bilet_id}
               `
-          );
+        );
       } catch (adminError) {
-          console.error(`Failed to notify admin ${groupId}:`, adminError.message);
+        console.error(`Failed to notify admin ${groupId}:`, adminError.message);
       }
     }
 
@@ -403,11 +416,12 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
       }
     );
 
-    await ctx.answerCbQuery(); 
-
+    await ctx.answerCbQuery();
   } catch (error) {
-    if (error.code === 400 && error.message.includes('chat not found')) {
-      console.warn(`[Buy Ticket] User ${ctx.from.id} blocked the bot after clicking. Database update successful, skipping reply.`);
+    if (error.code === 400 && error.message.includes("chat not found")) {
+      console.warn(
+        `[Buy Ticket] User ${ctx.from.id} blocked the bot after clicking. Database update successful, skipping reply.`
+      );
     } else {
       console.error("[Buy Ticket] An unexpected error occurred:", error);
     }
