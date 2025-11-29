@@ -138,7 +138,6 @@ bot.on("text", async (ctx) => {
       text += `\n✈️ Билет ID: ${order.bilet_id}`;
       text += `\n✈️ Багаж: ${order.bagaj}`;
       text += `\n💰 Тўлов: **${order.price}**\n`;
-      text += `\n------------------------`;
     }
     await ctx.reply(
       `Сизнинг харидларингиз
@@ -311,10 +310,11 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
     await ctx.telegram.sendMessage(
       groupId,
       `Yangi odam bilet sotib oldi:
-       \nusername:${oldUser.username}
+       \nusername:@${oldUser.username}
        \nphone: ${oldUser.phone}
        \nbilet nomi:${order.direction} to ${order.direction_to}
        \nkampaniya: ${order.company}
+       \bilet id: ${order.bilet_id}
       `
     );
   }

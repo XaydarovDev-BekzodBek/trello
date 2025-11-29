@@ -166,7 +166,7 @@ exports.addPeopel = async (req, res) => {
         .status(404)
         .json({ success: false, message: "order not found" });
     }
-    const user = order.clients.find((i) => i.userId == userId);
+    const user = order.clients.find((i) => i._id.toString() == userId);
 
     user.people = people;
 
