@@ -6,6 +6,7 @@ const middlewares = require("../middlewares");
 const {
   OrderCreateValidation,
   AddPeopleOrderValidation,
+  AddClientOrderValidation,
 } = require("../validations/order.validation");
 
 /**
@@ -68,6 +69,14 @@ router.post(
   // middlewares.verifyAdmin,
   middlewares.verifyValidation(OrderCreateValidation),
   controller.CreateOrder
+);
+
+router.post(
+  "/order/create/client/:id",
+  // middlewares.verifyToken,
+  // middlewares.verifyAdmin,
+  middlewares.verifyValidation(AddClientOrderValidation),
+  controller.addClient
 );
 
 /**

@@ -199,3 +199,25 @@ exports.deleteClient = async (req, res) => {
     return res.status(500).send(error);
   }
 };
+
+exports.addClient = async (req, res) => {
+  try {
+    const { username, phone } = req.body;
+    const { id } = req.params;
+
+    const order = await OrderModel.findById(id);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
+
+    order.clients.push({ username, phone });
+    await order.save();
+
+    return res.status(200).json({ message: "client added" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
+};

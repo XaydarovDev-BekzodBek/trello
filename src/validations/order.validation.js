@@ -32,8 +32,14 @@ const AddPeopleOrderValidation = Joi.object({
   people: Joi.number().required(),
 });
 
+const AddClientOrderValidation = Joi.object({
+  username: Joi.string().required(),
+  phone: Joi.string().required(),
+});
+
 module.exports = {
   OrderCreateValidation,
   OrderUpdateValidation,
   AddPeopleOrderValidation,
+  AddClientOrderValidation
 };

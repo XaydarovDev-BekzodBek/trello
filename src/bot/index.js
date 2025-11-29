@@ -309,7 +309,7 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
     const groupId = adminIds[i];
 
     await ctx.telegram.sendMessage(
-      groupId.groupId,
+      groupId,
       `Yangi odam bilet sotib oldi:
        \nusername:${oldUser.username}
        \nphone: ${oldUser.phone}
