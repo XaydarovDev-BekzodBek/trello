@@ -1,3 +1,4 @@
+const { sendTodayTicketsNotification } = require("../bot");
 const { OrderModel } = require("../models");
 
 exports.CreateOrder = async (req, res) => {
@@ -219,5 +220,42 @@ exports.addClient = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).send(error);
+  }
+};
+
+exports.sendTodayTickets = async (req, res) => {
+  const { date } = req.body;
+
+  if (!date) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Sana (date) maydoni majburiy." });
+  }
+
+  try {
+    const todayTickets = await OrderModel.find({ date: { $gte: date } })
+      .populate({
+        path: "clients.userId",
+        select: "full_name phone username",
+      })
+      .sort({ time: 1 });
+
+
+
+    await sendTodayTicketsNotification(date, todayTickets);
+
+    res.status(200).json({
+      success: true,
+      message: `${todayTickets.length} ta bilet Telegram guruhlariga yuborish jarayoniga qo'shildi.`,
+    });
+  } catch (error) {
+    console.error("Telegramga bilet yuborishda xato:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message:
+          "Telegramga xabar yuborishda kutilmagan xatolik. Loglarni tekshiring.",
+      });
   }
 };

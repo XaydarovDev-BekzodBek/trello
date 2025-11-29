@@ -18,7 +18,7 @@ const regions = [
   "Бухоро",
 ];
 
-console.log("bot.js is running")
+console.log("bot.js is running");
 
 const adminIds = ["-5007246078"];
 
@@ -38,6 +38,60 @@ const findUser = async (ctx) => {
     return newUser;
   } else {
     return user;
+  }
+};
+
+const formatSingleOrder = (order, index) => {
+  const totalPeople = order.clients
+    ? order.clients.reduce((sum, c) => sum + (c.people || 0), 0)
+    : 0;
+
+  return `
+*${index + 1}. Bilet ID:* ${order.bilet_id || "Yoʻq"}
+*Yo'nalish:* ${order.direction} ➡️ ${order.direction_to}
+*Vaqt:* ${order.time}${order.arrive_time ? ` - ${order.arrive_time}` : ""}
+*Narxi:* $${order.price} | *Kompaniya:* ${order.company || "Nomaʼlum"}
+*Jami kishi:* ${totalPeople}
+---`;
+};
+
+const sendTodayTicketsNotification = async (date, tickets) => {
+  let fullMessage;
+
+  if (tickets.length === 0) {
+    fullMessage = `
+*--- 🗓️ ${date} Sanasidagi Biletlar Ro'yxati ---*
+*Bugun jo'natiladigan biletlar topilmadi!*
+`;
+  } else {
+    const header = `
+*--- 🗓️ ${date} Sanasidagi Biletlar Ro'yxati (${tickets.length} ta) ---*
+`;
+    const ticketsMessage = tickets
+      .map((ticket, index) => formatSingleOrder(ticket, index))
+      .join("\n");
+
+    fullMessage = header + ticketsMessage;
+  }
+
+  await sendToAllChats(fullMessage);
+  return true;
+};
+
+const sendToAllChats = async (text) => {
+  const groups = await GroupIdModel.find({});
+  for (const chatId of groups) {
+    try {
+      await bot.telegram.sendMessage(chatId.groupId, text, {
+        parse_mode: "Markdown",
+      });
+      console.log(`Telegram xabari yuborildi: ${chatId}`);
+    } catch (error) {
+      console.error(
+        `Telegram xabari yuborishda xato (${chatId}):`,
+        error.message
+      );
+    }
   }
 };
 
@@ -336,4 +390,4 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
   );
 });
 
-module.exports = bot;
+module.exports = { bot, sendTodayTicketsNotification };

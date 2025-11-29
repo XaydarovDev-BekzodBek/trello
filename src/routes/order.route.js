@@ -78,7 +78,7 @@ router.post(
   middlewares.verifyValidation(AddClientOrderValidation),
   controller.addClient
 );
-
+router.post("/order/send-today-tickets", controller.sendTodayTickets);
 /**
  * @swagger
  * /api/order/list:
