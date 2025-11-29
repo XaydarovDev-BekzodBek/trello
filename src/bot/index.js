@@ -40,52 +40,59 @@ const findUser = async (ctx) => {
 };
 
 bot.start(async (ctx) => {
-  // if (ctx.chat.type === "group") {
-  //   const chatId = ctx.chat.id;
-  //   const oldGroup = await GroupIdModel.findOne({ groupId: chatId });
-  //   if (oldGroup) {
-  //     await ctx.reply("bot bu gurupada bor");
-  //   } else {
-  //     await GroupIdModel.create({ groupId: chatId });
-  //     await ctx.reply("Bot bu gurupada ishga tushdi");
-  //   }
-  // }
   const chatId = ctx.chat.id;
-  const oldGroup = await GroupIdModel.findOne({ groupId: chatId });
-  if (oldGroup || ctx.chat.type == "group") {
+
+  const isGroup = ctx.chat.type === "group" || ctx.chat.type === "supergroup";
+  const oldGroup = isGroup
+    ? await GroupIdModel.findOne({ groupId: chatId })
+    : null;
+
+  if (oldGroup || isGroup) {
     await ctx.reply("bot bu gurupada ishga tushmaydi");
-  } else {
-    const oldUser = await findUser(ctx);
-    oldUser.progress = "choose_direction";
-    await oldUser.save();
+    return; // Dasturni shu yerda to'xtatish
+  }
+
+  const oldUser = await findUser(ctx);
+
+  if (!oldUser) {
+    console.error(
+      `ERROR: Foydalanuvchi topilmadi/yaratilmadi! Chat ID: ${chatId}`
+    );
     await ctx.reply(
-      `🌟 Ассалому алайкум! 🌟
+      "Kechirasiz, texnik xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring."
+    );
+    return;
+  }
+
+  oldUser.progress = "choose_direction";
+  await oldUser.save();
+
+  const menuButtons = [
+    { text: "Бориш ✈️" },
+    { text: "Қайтиш 🏡" },
+    { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
+  ];
+
+  if (oldUser.username && oldUser.phone) {
+    menuButtons.splice(2, 0, { text: "Билетларим 🎟" }); 
+  }
+
+  const keyboardLayout = [menuButtons];
+
+  await ctx.reply(
+    `🌟 Ассалому алайкум! 🌟
 ✈️ "Арабистонга Билетлар" ботига хуш келибсиз!
 
-Биз сизга Саудия Арабистони каби Яқин Шарқ давлатларига энг қулай ва арзон авиачипталарни топишда ёрдам берамиз.
+Биз сизга Саудия Арабистони каби Яқин Шарқ давлатларига энг қулай ва арзон авиачипталарни топишda yordam beramiz.
 
-Марҳамат, қайси йўналишга (шаҳар ёки давлатга) учмоқчисиз? ⬇️⬇️⬇️`,
-      {
-        reply_markup: {
-          keyboard: [
-            oldUser.username && oldUser.phone
-              ? [
-                  { text: "Бориш ✈️" },
-                  { text: "Қайтиш 🏡" },
-                  { text: "Билетларим 🎟" },
-                  { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
-                ]
-              : [
-                  { text: "Бориш ✈️" },
-                  { text: "Қайтиш 🏡" },
-                  { text: "Aдмин билан боғланиш 🙎🏻‍♂️" },
-                ],
-          ],
-          resize_keyboard: true,
-        },
-      }
-    );
-  }
+Марҳамат, қайси йўналишга (шаҳар yoki давлатga) учmoqchisiz? ⬇️⬇️⬇️`,
+    {
+      reply_markup: {
+        keyboard: keyboardLayout,
+        resize_keyboard: true,
+      },
+    }
+  );
 });
 
 bot.command("group", async (ctx) => {
