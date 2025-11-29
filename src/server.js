@@ -30,7 +30,7 @@ app.use("/api", GroupIdRouter);
 const StatsRouter = require("./routes/stats.route");
 app.use("/api", StatsRouter);
 
-app.use('web_hook_bot',bot.webhookCallback(WEBHOOK_PATH));
+app.use(bot.webhookCallback(WEBHOOK_PATH));
 
 // bot.launch({
 //   webhook: {
