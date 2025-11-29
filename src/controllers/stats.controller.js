@@ -28,14 +28,10 @@ exports.getStats = async (req, res) => {
     };
 
     const buildStats = async (filter) => {
-      const orders = await Order.find(filter).populate("clients.userId")
+      const orders = await Order.find(filter).populate("clients.userId");
 
       let totalPrice = 0;
-      let totalBuyed = 0;
-      let totalTicket = orders.length;
-      let totalSold = 0;
-      let profit = 0;
-      let loss = 0;
+      let totalTannarxi = 0;
 
       orders.forEach((o, index) => {
         const totalPeople = o.clients.reduce((a, b) => a + (b.people || 0), 0);
@@ -43,21 +39,15 @@ exports.getStats = async (req, res) => {
         const b = Number(o.buyed_ticket) || 0;
 
         totalPrice += p;
-        totalBuyed += b;
-        totalSold += totalPeople;
-
-        const diff = p - b;
-        if (diff >= 0) profit += diff;
-        else loss += Math.abs(diff);
+        totalTannarxi += b;
       });
 
       return {
         totalPrice,
-        totalBuyed,
-        totalSold,
-        profit,
-        loss,
-        totalTicket,
+        totalTannarxi,
+        profit: totalPrice - totalTannarxi,
+        loss:
+          totalPrice - totalTannarxi < 0 ? -(totalPrice - totalTannarxi) : 0,
         tickets: orders,
       };
     };

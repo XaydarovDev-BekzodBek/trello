@@ -152,18 +152,18 @@ bot.start(async (ctx) => {
   );
 });
 
-bot.command("group", async (ctx) => {
-  if (ctx.chat.type === "group") {
-    const chatId = ctx.chat.id;
-    const oldGroup = await GroupIdModel.findOne({ groupId: chatId });
-    if (oldGroup) {
-      await ctx.reply("bot bu gurupada bor");
-    } else {
-      await GroupIdModel.create({ groupId: chatId });
-      await ctx.reply("Bot bu gurupada ishga tushdi");
-    }
-  }
-});
+// bot.command("group", async (ctx) => {
+//   if (ctx.chat.type === "group") {
+//     const chatId = ctx.chat.id;
+//     const oldGroup = await GroupIdModel.findOne({ groupId: chatId });
+//     if (oldGroup) {
+//       await ctx.reply("bot bu gurupada bor");
+//     } else {
+//       await GroupIdModel.create({ groupId: chatId });
+//       await ctx.reply("Bot bu gurupada ishga tushdi");
+//     }
+//   }
+// });
 
 bot.on("text", async (ctx) => {
   const oldUser = await findUser(ctx);
