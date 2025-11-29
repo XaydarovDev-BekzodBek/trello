@@ -207,12 +207,16 @@ bot.on("text", async (ctx) => {
     switch (progress) {
       case "choose_direction":
         if (!oldUser.username || !oldUser.phone) {
-          oldUser.progress = "take_full_name";
-          await ctx.reply(
-            "Илтимос Исm ва фамилиянгизни ёзинг",
-            Markup.removeKeyboard()
-          );
-          await oldUser.save();
+          oldUser.progress = "take_phone";
+          await ctx.reply("Илтимос телефон рақамингизни киритинг", {
+            reply_markup: {
+              keyboard: [
+                [{ text: "📲 Телефон рақамини улашиш", request_contact: true }],
+              ],
+              one_time_keyboard: true,
+              resize_keyboard: true,
+            },
+          });
         } else {
           const formatedRegions = [];
           for (let i = 0; i < regions.length; i += 3) {
@@ -261,29 +265,29 @@ bot.on("text", async (ctx) => {
 
         await ctx.reply(replyText, Markup.inlineKeyboard(formated));
         break;
-      case "take_full_name":
-        const full_name = ctx.message.text.split(" ");
+        // case "take_full_name":
+        //   const full_name = ctx.message.text.split(" ");
 
-        if (!full_name[0] || !full_name[1] || full_name.length == 0) {
-          await ctx.reply(
-            "Сиз нотўғри ҳолатда ёздингиз исм фамилия ёзиш керак"
-          );
-        } else {
-          oldUser.progress = "take_number";
-          oldUser.full_name = full_name.join(" ");
-          await oldUser.save();
-          await ctx.reply("Илтимос телефон рақамингизни киритинг", {
-            reply_markup: {
-              keyboard: [
-                [{ text: "📲 Телефон рақамини улашиш", request_contact: true }],
-              ],
-              one_time_keyboard: true,
-              resize_keyboard: true,
-            },
-          });
-        }
-        break;
-      default:
+        //   if (!full_name[0] || !full_name[1] || full_name.length == 0) {
+        //     await ctx.reply(
+        //       "Сиз нотўғри ҳолатда ёздингиз исм фамилия ёзиш керак"
+        //     );
+        //   } else {
+        //     oldUser.progress = "take_number";
+        //     oldUser.full_name = full_name.join(" ");
+        //     await oldUser.save();
+        //     await ctx.reply("Илтимос телефон рақамингизни киритинг", {
+        //       reply_markup: {
+        //         keyboard: [
+        //           [{ text: "📲 Телефон рақамини улашиш", request_contact: true }],
+        //         ],
+        //         one_time_keyboard: true,
+        //         resize_keyboard: true,
+        //       },
+        //     });
+        //   }
+        //   break;
+        // default:
         break;
     }
   }
