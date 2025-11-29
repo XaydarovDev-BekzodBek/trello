@@ -137,8 +137,8 @@ bot.start(async (ctx) => {
   const keyboardLayout = [menuButtons];
 
   await ctx.reply(
-    `🌟 Ассалому алайкум! 🌟
-✈️ "Арабистонга Билетлар" ботига хуш келибсиз!
+    `Ассалому алайкум! 
+"Арабистонга Билетлар" ботига хуш келибсиз!
 
 Биз сизга Саудия Арабистони каби Яқин Шарқ давлатларига энг қулай ва арзон авиачипталарни топишda yordam beramiz.
 
@@ -227,8 +227,11 @@ bot.on("text", async (ctx) => {
             ctx.message.text == "Бориш ✈️" ? "go" : "return"
           }`;
           await oldUser.save();
+          //
           await ctx.reply(
-            "Бориш учун биринчи ўринда Шаҳар танланг!",
+            ctx.message.text == "Бориш ✈️"
+              ? "Бориш учун биринчи ўринда Шаҳар танланг!"
+              : "Қайтмоқчи бўлган шаҳарни танланг!",
             Markup.keyboard(formatedRegions)
           );
         }
@@ -247,7 +250,7 @@ bot.on("text", async (ctx) => {
         const formated = [];
 
         if (orders.length === 0) {
-          replyText += "";
+          await ctx.reply("Ҳозирча бу шаҳарга жойлар қолмаган, ўзингизга яқинроқ шаҳарни танланг")
         } else {
           for (let i = 0; i < orders.length; i++) {
             const order = orders[i];
@@ -257,13 +260,13 @@ bot.on("text", async (ctx) => {
               Markup.button.callback(i + 1, `choose_ticket_${order._id}`)
             );
           }
-        }
 
-        for (let i = 0; i < buttons.length; i += 4) {
-          formated.push(buttons.slice(i, i + 4));
-        }
+          for (let i = 0; i < buttons.length; i += 4) {
+            formated.push(buttons.slice(i, i + 4));
+          }
 
-        await ctx.reply(replyText, Markup.inlineKeyboard(formated));
+          await ctx.reply(replyText, Markup.inlineKeyboard(formated));
+        }
         break;
         // case "take_full_name":
         //   const full_name = ctx.message.text.split(" ");
@@ -326,7 +329,6 @@ bot.action(/choose_ticket_([a-fA-F0-9]+)/, async (ctx) => {
   } else {
     await ctx.reply(
       `
-\n💰 Тўлов: ${order.price}
 📆Сана: ${order.date}
 🛬Кетиш вақти: ${order.time}
 🛬Қуниш вақти: ${order.arrive_time || ""}
@@ -334,6 +336,7 @@ bot.action(/choose_ticket_([a-fA-F0-9]+)/, async (ctx) => {
 ✈️ Багаж: ${order.bagaj}
 🛩 Кампания : ${order.company || ""}
 🛩 Рейс : ${order.bilet_id || ""}
+💰 Тўлов: ${order.price}
 🍱 Иссиқ Таом 
 💧 Замзам
 `,

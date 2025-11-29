@@ -29,7 +29,7 @@ app.use("/api", GroupIdRouter);
 const StatsRouter = require("./routes/stats.route");
 app.use("/api", StatsRouter);
 
-app.use(bot.webhookCallback(WEBHOOK_PATH));
+// app.use(bot.webhookCallback(WEBHOOK_PATH));
 
 // bot.launch({
 //   webhook: {
@@ -38,6 +38,7 @@ app.use(bot.webhookCallback(WEBHOOK_PATH));
 //     path: "/tg_webhook_1a2b3c4d5e6f7g8h9i0j",
 //   },
 // });
+bot.launch()
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
@@ -65,11 +66,13 @@ jobsConfig.forEach((job) => {
   }
 });
 
+
+
 app.listen(PORT, () => {
   ConnectionToDB();
   initSuperAdmin();
   console.log("app is running");
-  bot.telegram.setWebhook(`https://trello.techinfo.uz${WEBHOOK_PATH}`);
+  // bot.telegram.setWebhook(`https://trello.techinfo.uz${WEBHOOK_PATH}`);
 
   console.log("Webhook o'rnatildi.");
 });
