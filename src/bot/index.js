@@ -31,7 +31,7 @@ const findUser = async (ctx) => {
   if (!user) {
     const newUser = await BotClientModel.create({
       chat_id: ctx.chat.id,
-      username: ctx.chat.username,
+      username: ctx.chat.username || "username yo`q akaunt",
       language: "",
     });
     console.log("user created");
