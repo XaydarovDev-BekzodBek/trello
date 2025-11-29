@@ -18,6 +18,8 @@ const regions = [
   "Бухоро",
 ];
 
+console.log("bot.js is running")
+
 const adminIds = ["-5007246078"];
 
 const bot = new Telegraf(BOT_TOKEN);
@@ -41,6 +43,7 @@ const findUser = async (ctx) => {
 
 bot.start(async (ctx) => {
   const chatId = ctx.chat.id;
+  console.log("added text");
 
   const isGroup = ctx.chat.type === "group" || ctx.chat.type === "supergroup";
   const oldGroup = isGroup
@@ -248,15 +251,12 @@ bot.on("contact", async (ctx) => {
     oldUser.phone = phoneNumber;
     oldUser.progress = "choose_direction";
     await oldUser.save();
-    await ctx.reply(
-      "Сиз рўйхатдан ўтдингиз сиз нима қилмоқчисиз",
-      {
-        reply_markup: {
-          keyboard: [[{ text: "Бориш ✈️" }, { text: "Қайтиш 🏡" }]],
-          resize_keyboard: true,
-        },
-      }
-    );
+    await ctx.reply("Сиз рўйхатдан ўтдингиз сиз нима қилмоқчисиз", {
+      reply_markup: {
+        keyboard: [[{ text: "Бориш ✈️" }, { text: "Қайтиш 🏡" }]],
+        resize_keyboard: true,
+      },
+    });
   }
 });
 
