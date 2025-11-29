@@ -49,7 +49,7 @@ bot.start(async (ctx) => {
 
   if (oldGroup || isGroup) {
     await ctx.reply("bot bu gurupada ishga tushmaydi");
-    return; // Dasturni shu yerda to'xtatish
+    return;
   }
 
   const oldUser = await findUser(ctx);
@@ -74,7 +74,7 @@ bot.start(async (ctx) => {
   ];
 
   if (oldUser.username && oldUser.phone) {
-    menuButtons.splice(2, 0, { text: "Билетларим 🎟" }); 
+    menuButtons.splice(2, 0, { text: "Билетларим 🎟" });
   }
 
   const keyboardLayout = [menuButtons];
@@ -127,9 +127,15 @@ bot.on("text", async (ctx) => {
     });
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
-      text += `\n\n🗓 Сана: ${order.date} 
-⏱ Кетиш вақти: ${order.time} 
-💰 Тўлов: ${order.price}\n`;
+      text += `\n✈️ Йўналиш: ${order.direction}`;
+      text += `\n✈️ Қаерга бориш: ${order.direction_to}`;
+      text += `\n🗓 Сана: **${order.date}**`;
+      text += `\n⏱ Кетиш вақти: **${order.time}**`;
+      text += `\n✈️ Компания: ${order.company}`;
+      text += `\n✈️ Билет ID: ${order.bilet_id}`;
+      text += `\n✈️ Багаж: ${order.bagaj}`;
+      text += `\n💰 Тўлов: **${order.price}**\n`;
+      text += `\n------------------------`;
     }
     await ctx.reply(
       `Сизнинг харидларингиз
@@ -244,12 +250,6 @@ bot.on("contact", async (ctx) => {
     await oldUser.save();
     await ctx.reply(
       "Сиз рўйхатдан ўтдингиз сиз нима қилмоқчисиз",
-      // Markup.keyboard([
-      //   [
-      //     Markup.button.callback("Бориш ✈️"),
-      //     Markup.button.callback("Қайтиш 🏡"),
-      //   ],
-      // ])
       {
         reply_markup: {
           keyboard: [[{ text: "Бориш ✈️" }, { text: "Қайтиш 🏡" }]],
@@ -273,6 +273,8 @@ bot.action(/choose_ticket_([a-fA-F0-9]+)/, async (ctx) => {
 📆Сана: ${order.date}
 🛬Кетиш вақти: ${order.time}
 🛬Қуниш вақти: ${order.arrive_time || ""}
+✈️ Билет ID: ${order.bilet_id}
+✈️ Багаж: ${order.bagaj}
 🛩 Кампания : ${order.company || ""}
 🛩 Рейс : ${order.bilet_id || ""}
 🍱 Иссиқ Таом 
@@ -333,37 +335,5 @@ bot.action(/buy_ticket_([a-fA-F0-9]+)/, async (ctx) => {
     }
   );
 });
-
-// bot.action("borish", async (ctx) => {
-//   const oldUser = await findUser(ctx);
-//   const regions = languages[oldUser.language || "uzb"]["regions"];
-//   const formated = [];
-//   for (let i = 0; i < regions.length; i += 3) {
-//     formated.push(regions.slice(i, i + 3));
-//   }
-
-//   oldUser.progress = "choose_region__go";
-//   await oldUser.save();
-//   await ctx.reply(
-//     "Borish uchun birinchi o`rinda Shahar tanlang!",
-//     Markup.keyboard(formated)
-//   );
-// });
-
-// bot.action("qaytish", async (ctx) => {
-//   const oldUser = await findUser(ctx);
-//   const regions = languages[oldUser.language || "uzb"]["regions"];
-//   const formated = [];
-//   for (let i = 0; i < regions.length; i += 3) {
-//     formated.push(regions.slice(i, i + 3));
-//   }
-
-//   oldUser.progress = "choose_region__return";
-//   await oldUser.save();
-//   await ctx.reply(
-//     "Qaytish uchun birinchi o`rinda Shahar tanlang!",
-//     Markup.keyboard(formated)
-//   );
-// });
 
 module.exports = bot;

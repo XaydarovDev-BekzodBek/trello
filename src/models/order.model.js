@@ -2,8 +2,10 @@ const { Schema, model } = require("mongoose");
 
 const OrderClientSchema = new Schema(
   {
-    userId: { type: Schema.ObjectId, required: true, ref: "BotClient" },
+    userId: { type: Schema.ObjectId, ref: "BotClient" },
     people: { type: Number },
+    username: { type: String, defaultValue: "" },
+    phone: { type: String, defaultValue: "" },
   },
   { timestamps: true }
 );
@@ -22,7 +24,7 @@ const OrderSchema = new Schema(
     is_acitve: { type: Boolean, defaultValue: false },
     company: { type: String, defaultValue: "" },
     bilet_id: { type: String, defaultValue: "" },
-    type: { type: String, enum: ["go", "return"], required: true },
+    type: { type: String, enum: ["go", "return", "alone"], required: true },
   },
   { timestamps: true }
 );
