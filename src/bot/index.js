@@ -26,7 +26,7 @@ const bot = new Telegraf(BOT_TOKEN);
 const deleteChatIds = new Map();
 const users = new Map();
 
-const findUserOptimized = async (ctx) => {
+const findUser = async (ctx) => {
   const updateData = {
     username: ctx.chat.username || "username yo`q akaunt",
   };
