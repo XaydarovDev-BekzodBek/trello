@@ -26,26 +26,21 @@ const bot = new Telegraf(BOT_TOKEN);
 const deleteChatIds = new Map();
 const users = new Map();
 
-const findUser = async (ctx) => {
-  const user = await BotClientModel.findOne({ chat_id: ctx.chat.id });
-  if (!user) {
-    const newUser = await BotClientModel.create({
-      chat_id: ctx.chat.id,
-      username: ctx.chat.username || "username yo`q akaunt",
-      language: "",
-    });
-    console.log("user created");
-    return newUser;
-  } else {
-    if (user.username != ctx.chat.username) {
-      user.username = ctx.chat.username;
-    } else if (user.phone != ctx.chat.phone) {
-      user.phone = ctx.chat.phone;
-    }
+const findUserOptimized = async (ctx) => {
+  const updateData = {
+    username: ctx.chat.username || "username yo`q akaunt",
+  };
 
-    await user.save() 
-    return user;
-  }
+  const user = await BotClientModel.findOneAndUpdate(
+    { chat_id: ctx.chat.id },
+    { $set: updateData },
+    {
+      new: true,
+      upsert: true,
+    }
+  );
+
+  return user;
 };
 
 const formatSingleOrder = (order, index) => {
@@ -237,7 +232,6 @@ bot.on("text", async (ctx) => {
             ctx.message.text == "Бориш ✈️" ? "go" : "return"
           }`;
           await oldUser.save();
-          //
           await ctx.reply(
             ctx.message.text == "Бориш ✈️"
               ? "Бориш учун биринчи ўринда Шаҳар танланг!"
